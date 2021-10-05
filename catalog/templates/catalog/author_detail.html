@@ -1,10 +1,11 @@
 {% extends "base_generic.html" %}
 
-{% block content %}
+{% block page-title %}
   <h1>Author: {{ author.first_name }} {{ author.last_name }}</h1>
   <p>{{author.date_of_birth}} - {{author.date_of_death}}</p>
+{% endblock %}
 
-  <br>
+{% block content %}
   <div style="margin-left:20px;margin-top:20px">
     <h2>Books:</h2>
     {% for bo in author.book_set.all %}
