@@ -3,12 +3,21 @@
 {% block page-title %}<h1>Book List</h1>{% endblock %}
 
 {% block content %}
+    {% if perms.catalog.can_mark_returned %}
+        <a href="{% url 'book_create' %}"><h2>Add a new book</h2></a>
+        <br>
+    {% endif %}
+
     {% if object_list %}
     <ul>
 
       {% for book in object_list %}
       <li>
         <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{book.author}})
+          {% if perms.catalog.can_mark_returned %}
+            - <a href="{% url 'book_update' book.id %}">Renew</a>
+            - <a href="{% url 'book_delete' book.id %}">Delete</a>
+          {% endif %}
       </li>
       {% endfor %}
 
