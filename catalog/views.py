@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Book, Author, BookInstance, Genre
+from .models import Book, BookInstance, Genre
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
@@ -82,7 +82,7 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
     Generic class-based view listing books on loan to current user.
     """
     model = BookInstance
-    template_name ='catalog/bookinstance_list_borrowed_user.html'
+    template_name = 'catalog/bookinstance_list_borrowed_user.html'
     paginate_by = 10
 
     def get_queryset(self):
@@ -91,7 +91,7 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
 
 class LoanedBooksListView(PermissionRequiredMixin, generic.ListView):
     model = BookInstance
-    template_name ='catalog/bookinstance_list_borroweds.html'
+    template_name = 'catalog/bookinstance_list_borroweds.html'
     paginate_by = 10
     permission_required = 'catalog.can_mark_returned'
 
@@ -124,43 +124,46 @@ def renew_book_librarian(request, pk):
     # If this is a GET (or any other method) create the default form.
     else:
         proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
-        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date,})
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date, })
 
     return render(request, 'catalog/book_renew_librarian.html', {'form': form, 'bookinst': book_inst})
 
 
-class AuthorCreate(CreateView):
-    # использует шаблон locallibrary/catalog/templates/catalog/author_form.html
+class AuthorCreate(PermissionRequiredMixin, CreateView):
     model = Author
     fields = '__all__'
-    initial = {'date_of_death': '12/10/2016'}
+    initial = {'date_of_death': datetime.date.today().strftime('%d/%m/%Y')}
+    permission_required = 'catalog.can_mark_returned'
 
 
-class AuthorUpdate(UpdateView):
-    # использует шаблон locallibrary/catalog/templates/catalog/author_form.html
+class AuthorUpdate(PermissionRequiredMixin, UpdateView):
     model = Author
-    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    fields = '__all__'  # Not recommended (potential security issue if more fields added)
+    permission_required = 'catalog.can_mark_returned'
 
 
-class AuthorDelete(DeleteView):
-    # использует шаблон locallibrary / catalog / templates / catalog / author_confirm_delete.html
+class AuthorDelete(PermissionRequiredMixin, DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
+    permission_required = 'catalog.can_mark_returned'
 
 
-class BookCreate(CreateView):
+class BookCreate(PermissionRequiredMixin, CreateView):
     # использует шаблон locallibrary / catalog / templates / catalog / book_form.html
     model = Book
     fields = '__all__'
+    permission_required = 'catalog.can_mark_returned'
 
 
-class BookUpdate(UpdateView):
+class BookUpdate(PermissionRequiredMixin, UpdateView):
     # использует шаблон locallibrary / catalog / templates / catalog / book_form.html
     model = Book
     fields = '__all__'
+    permission_required = 'catalog.can_mark_returned'
 
 
-class BookDelete(DeleteView):
+class BookDelete(PermissionRequiredMixin, DeleteView):
     # использует шаблон locallibrary / catalog / templates / catalog / book_confirm_delete.html
     model = Book
     success_url = reverse_lazy('books')
+    permission_required = 'catalog.can_mark_returned'
